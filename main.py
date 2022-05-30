@@ -3,6 +3,8 @@ from cmath import *
 from sympy import *
 
 x = Symbol('x')
+c1 = Symbol('c1')
+c2 = Symbol('c2')
 
 
 
@@ -119,7 +121,7 @@ class HomogenousSecondOrderDifferentialEquation:
         '''
         e ^ ax (c1 sin(bx) +  c2 cos(bx))
         
-        the complex solutions will be a +- bi
+        the complex solutions will be in the form a +- bi
         '''
         
         a = c1.real
@@ -128,8 +130,97 @@ class HomogenousSecondOrderDifferentialEquation:
         return (e ** (a * x)) * sin(b * x), (e ** (a * x)) * cos(b * x)
     
 
-
-ee = HomogenousSecondOrderDifferentialEquation(135135135, 1145987612459876)
-     
-
+class NonhomogeneousSecondOrderDifferentialEquation(HomogenousSecondOrderDifferentialEquation):
+    '''
+    Uses variation of parameters to solve for the particular solution to the differential equation and
+    Uses a characteristic equation and the quadratic formula to solve for the characteristic solutions to the differential equation
+    '''
     
+    def __init__(self, a, b, r):
+        super().__init__(a, b)
+        self.r = r
+    
+    
+    
+    
+    def findParticularSolution(self):
+        '''
+        u'y1 + v'y2 = 0
+        u'y1' + v'y2' = r
+        
+        
+        The particular solution is uy1 + vy2 where 
+            u and v are the solutions to the system of equations defined above
+            y1 and y2 are the general characteristic solutions to the corresponding homogenous differential equation where r = 0
+        '''
+        
+        y1, y2 = super().solve()
+        
+        # create the system of equations
+        '''
+        u_prime = Symbol('u\'')
+        v_prime = Symbol('v\'')
+        '''
+        y1_prime = diff(y1, x)
+        y2_prime = diff(y2, x)
+        
+     
+        
+        
+      
+        
+        # cramer's rule
+        '''
+        demoninator
+        
+        y1       y2
+        y1_prime y2_prime
+        
+        
+        numerator u'
+        
+        
+        0       y2
+        r       y2_prime
+        
+        numerator v'
+        
+        y1       0
+        y1_prime r
+        '''
+        
+        
+        
+        denominator = Matrix([[y1, y2], [y1_prime, y2_prime]])
+        numerator_u_prime = Matrix([[0, y2], [self.r, y2_prime]])
+        numerator_v_prime = Matrix([[y1, 0], [y1_prime, self.r]])
+        
+        
+        u_prime = numerator_u_prime.det() / denominator.det()
+        v_prime = numerator_v_prime.det() / denominator.det()
+        
+        
+        u = integrate(u_prime, x)
+        v = integrate(v_prime, x)
+        
+        
+        return u * y1 + v * y2
+
+    def solve(self):
+        y1, y2 = super().solve()
+        
+        yp = self.findParticularSolution()
+        
+        return c1 * y1 + c2 * y2 + yp
+        
+        
+        
+        
+        
+        
+        
+        
+    
+test = NonhomogeneousSecondOrderDifferentialEquation(-2, 1, x)
+
+print(test.solve())
