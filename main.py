@@ -1,7 +1,11 @@
-from sympy import *
+
 from cmath import *
+from sympy import *
 
 x = Symbol('x')
+
+
+
 
 class System:
     '''
@@ -71,13 +75,61 @@ class QuadraticEquation:
         
     def solve(self):
         d = (self.b**2) - (4*self.a*self.c)
-        x1 = (-self.b-sqrt(d))/(2*self.a)  
-        x2 = (-self.b+sqrt(d))/(2*self.a)
+        x1 = complex((-self.b-sqrt(d))/(2*self.a))
+        x2 = complex((-self.b+sqrt(d))/(2*self.a))
         
         return (x1, x2)
                 
                 
-e = QuadraticEquation(1, 0, 1)
+class HomogenousSecondOrderDifferentialEquation:
+    '''
+    y'' + a * y' + b * y = 0
+    '''
+    
+    
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+    
+    @property
+    def characteristicEquation(self):
+        return QuadraticEquation(1, self.a, self.b)
+    
+    
+    def solveCharacteristicEquation(self):
+        return self.characteristicEquation.solve()
+        
+    def solve(self):
+        c1, c2 = self.solveCharacteristicEquation()
+        
+        # check if they're imaginary
+        # if they're both real
+        if c1.imag == 0 and c2.imag == 0:
+            # check if the solutions are lineraly independant
+            # if they are lineraly independant
+            if c1 != c2:
+                return (e ** (c1 * x), e ** (c2 * x))
+            # if they are lineraly dependant
+            else:
+                return (e ** (c1 * x), x * e ** (c2 * x))
+            
+            
+        
+        # if they're both imaginary
+        '''
+        e ^ ax (c1 sin(bx) +  c2 cos(bx))
+        
+        the complex solutions will be a +- bi
+        '''
+        
+        a = c1.real
+        b = abs(c1.imag)
 
-print(e.solve())
+        return (e ** (a * x)) * sin(b * x), (e ** (a * x)) * cos(b * x)
+    
 
+
+ee = HomogenousSecondOrderDifferentialEquation(135135135, 1145987612459876)
+     
+
+    
